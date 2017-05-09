@@ -2,9 +2,11 @@
 
     stipplegen.lua - Render a portrait with stipplegen
 
+    Portions are lifted from gimp.lua and thus are
+
     Copyright (C) 2016 Bill Ferguson <wpferguson@gmail.com>.
 
-    Portions are lifted from hugin.lua and thus are
+    gimp.lua has portions lifted from hugin.lua and thus are
 
     Copyright (c) 2014  Wolfgang Goetz
     Copyright (c) 2015  Christian Kanzian
@@ -71,7 +73,7 @@ local gettext = dt.gettext
 dt.configuration.check_version(...,{3,0,0},{4,0,0},{5,0,0})
 
 -- Tell gettext where to find the .mo file translating messages for a particular domain
-gettext.bindtextdomain("gimp",dt.configuration.config_dir.."/lua/locale/")
+gettext.bindtextdomain("stipplegen",dt.configuration.config_dir.."/lua/locale/")
 
 local function split_filepath(str)
   local result = {}
@@ -101,7 +103,7 @@ local function get_filetype(str)
 end
 
 local function _(msgid)
-    return gettext.dgettext("gimp", msgid)
+    return gettext.dgettext("stipplegen", msgid)
 end
 
 -- Thanks Tobias Jakobs for the idea and the correction
@@ -233,15 +235,17 @@ local function fileMove(fromFile, toFile)
   return success  -- nil on error, some value if success
 end
 
-local function gimp_edit(storage, image_table, extra_data) --finalize
-  if not df.check_if_bin_exists("gimp") then
-    dt.print_error(_("GIMP not found"))
+local function stipple_render(storage, image_table, extra_data) --finalize
+  if not df.check_if_bin_exists("processing-java") then
+    dt.print_error(_("processing-java not found"))
     return
   end
 
   -- list of exported images
   local img_list
 
+  -- absolute path to StippleGen processing sketch
+  local sketch_path = "/home/ordi/src/stipplegen/StippleGen"
    -- reset and create image list
   img_list = ""
 
@@ -250,10 +254,10 @@ local function gimp_edit(storage, image_table, extra_data) --finalize
     img_list = img_list ..exp_img.. " "
   end
 
-  dt.print(_("Launching GIMP..."))
+  dt.print(_("Launching StippleGen..."))
 
   local gimpStartCommand
-  gimpStartCommand = "gimp "..img_list
+  gimpStartCommand = "processing-java --sketch="..sketch_path.." --run "..img_list
 
   dt.print_error(gimpStartCommand)
 
@@ -297,6 +301,6 @@ local function gimp_edit(storage, image_table, extra_data) --finalize
 end
 
 -- Register
-dt.register_storage("module_gimp", _("Edit with GIMP"), show_status, gimp_edit)
+dt.register_storage("module_gimp", _("Open with Stipplegen"), show_status, stipple_render)
 
 --
