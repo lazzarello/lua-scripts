@@ -27,7 +27,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ]]
 --[[
-    gimp - export an image and open with GIMP for editing
+    stipplegen - export an image and open with stipplegen 
 
     This script provides another storage (export target) for darktable.  Selected
     images are exported in the specified format to temporary storage.  GIMP is launched
@@ -256,12 +256,12 @@ local function stipple_render(storage, image_table, extra_data) --finalize
 
   dt.print(_("Launching StippleGen..."))
 
-  local gimpStartCommand
-  gimpStartCommand = "processing-java --sketch="..sketch_path.." --run "..img_list
+  local stippleStartCommand
+  stippleStartCommand = "processing-java --sketch="..sketch_path.." --run "..img_list
 
-  dt.print_error(gimpStartCommand)
+  dt.print_error(stippleStartCommand)
 
-  dt.control.execute( gimpStartCommand)
+  dt.control.execute( stippleStartCommand)
 
   -- for each of the image, exported image pairs
   --   move the exported image into the directory with the original
@@ -272,6 +272,7 @@ local function stipple_render(storage, image_table, extra_data) --finalize
 
     local myimage_name = image.path .. "/" .. get_filename(exported_image)
 
+    --[[
     while checkIfFileExists(myimage_name) do
       myimage_name = filename_increment(myimage_name)
       -- limit to 99 more exports of the original export
@@ -282,7 +283,6 @@ local function stipple_render(storage, image_table, extra_data) --finalize
 
     dt.print_error("moving " .. exported_image .. " to " .. myimage_name)
     local result = fileMove(exported_image, myimage_name)
-
     if result then
       dt.print_error("importing file")
       local myimage = dt.database.import(myimage_name)
@@ -296,6 +296,7 @@ local function stipple_render(storage, image_table, extra_data) --finalize
         end
       end
     end
+    ]]
   end
 
 end
